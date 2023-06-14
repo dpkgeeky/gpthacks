@@ -36,7 +36,7 @@ export const loadDocumentQA = async () => {
 
     // console.log(documents)
     const vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
-    return RetrievalQAChain.fromLLM(new OpenAI({
+    return RetrievalQAChain.fromLLM(new ChatOpenAI({
         temperature: 0,
         modelName: MODEL,
         openAIApiKey: API_KEY,

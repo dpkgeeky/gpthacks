@@ -16,7 +16,7 @@ export const loadDocumentQAJson = async () => {
         "./financeJson/Cleaned_date.json",
         ["/instruction", "/input","/output", "/text"]
       );
-
+      
     let startTime = new Date();
     const documentsAll = await loader.load();
 
@@ -42,7 +42,7 @@ export const loadDocumentQAJson = async () => {
     const vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
     console.log('vectors generated - time taken - ' + timediffrence(startTime) + ' ms');
     startTime = new Date();
-    const retrievalQAChain = RetrievalQAChain.fromLLM(new OpenAI({
+    const retrievalQAChain = RetrievalQAChain.fromLLM(new ChatOpenAI({
         temperature: 0,
         modelName: MODEL,
         openAIApiKey: API_KEY,
