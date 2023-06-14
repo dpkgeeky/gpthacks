@@ -12,16 +12,17 @@ import { systemMesssage } from './prompts.js'
 const { API_VERSION, API_KEY, DEPLOYMENT, HOSTNAME, MODEL, EMBEDDINGS } = process.env;
 
 export const loadDocumentQAJson = async () => {
-    
     const loader = new JSONLoader(
         "./financeJson/Cleaned_date.json",
         ["/instruction", "/input","/output", "/text"]
       );
-      
+
+    let startTime = new Date();
     const documentsAll = await loader.load();
 
-    console.log('completed json document loading', documentsAll.length);
+    console.log('completed json document loading - time taken - ' + timediffrence(startTime) + ' ms', documentsAll.length);
     
+    startTime = new Date();
     const embeddings = new OpenAIEmbeddings({
         openAIApiKey: API_KEY,
         modelName: EMBEDDINGS,
@@ -32,12 +33,16 @@ export const loadDocumentQAJson = async () => {
         batchSize: 1
     });
 
-    console.log('embeddings', embeddings);
+    console.log('embeddings generated - time taken - ' + timediffrence(startTime) + ' ms',);
 
-    const documents = documentsAll.slice(0,10);
-    console.log('documents', documents);
+    startTime = new Date();
+    const documents = documentsAll.slice(0,100);
+    console.log('documents sliced - time taken - ' + timediffrence(startTime) + ' ms');
+    startTime = new Date();
     const vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
-    return RetrievalQAChain.fromLLM(new OpenAI({
+    console.log('vectors generated - time taken - ' + timediffrence(startTime) + ' ms');
+    startTime = new Date();
+    const retrievalQAChain = RetrievalQAChain.fromLLM(new OpenAI({
         temperature: 0,
         modelName: MODEL,
         openAIApiKey: API_KEY,
@@ -46,9 +51,14 @@ export const loadDocumentQAJson = async () => {
         azureOpenAIApiInstanceName: HOSTNAME,
         azureOpenAIApiDeploymentName: DEPLOYMENT
     }), vectorStore.asRetriever(), { returnSourceDocuments: false });
+
+    console.log('RetrievalQAChain generated - time taken - ' + timediffrence(startTime) + ' ms');
+    return retrievalQAChain;
 };
 
 export const askGPTJson = async (question, originalAnswer) => {
+    console.log('askGPTJson initiated');
+    let startTime = new Date();
     const chat = new ChatOpenAI({
         temperature: 0,
         modelName: MODEL,
@@ -58,11 +68,21 @@ export const askGPTJson = async (question, originalAnswer) => {
         azureOpenAIApiInstanceName: HOSTNAME,
         azureOpenAIApiDeploymentName: DEPLOYMENT
     });
+    console.log('ChatOpenAI generated - time taken - ' + timediffrence(startTime) + ' ms');
+    startTime = new Date();
     const response = await chat.call([
         new SystemChatMessage(systemMesssage),
         new HumanChatMessage(question),
         new AIChatMessage(originalAnswer),
     ]);
+    console.log('Response generated - time taken - ' + timediffrence(startTime) + ' ms');
 
     return response;
+}
+
+function timediffrence(timestamp1) {
+    var difference = (new Date()) - timestamp1;
+    var daysDifference = Math.floor(difference);
+
+    return daysDifference;
 }
