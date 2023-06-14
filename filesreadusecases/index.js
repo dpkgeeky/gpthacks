@@ -1,5 +1,5 @@
 import 'dotenv/config';
-
+import cors from 'cors'
 import express, { Router } from 'express';
 import { loadDocumentQA, askGPT } from './utilsPDF.js';
 // import { loadDocumentQAJson, askGPTJson } from './utilsJson.js';
@@ -7,7 +7,7 @@ import { loadDocumentQA, askGPT } from './utilsPDF.js';
 const app = express();
 const router = Router();
 app.use(express.json());
-
+app.use(cors())
 console.log('Loading the pdf document...');
 
 const QA = await loadDocumentQA();
