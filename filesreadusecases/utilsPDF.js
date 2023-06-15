@@ -13,8 +13,9 @@ const { API_VERSION, API_KEY, DEPLOYMENT, HOSTNAME, MODEL, EMBEDDINGS } = proces
 
 export const loadDocumentQA = async () => {
     const paths = [
-        './pdf/TC.pdf',
-        './pdf/HSBC-Codes.pdf'
+        //'./pdf/TC.pdf',
+        //'./pdf/HSBC-Codes.pdf',
+        './pdf/EmiratesNBD_BB_Schedule_of_charges.pdf'
     ];
 
     let documents = []
